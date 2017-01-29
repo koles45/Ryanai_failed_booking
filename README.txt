@@ -5,7 +5,7 @@
 #
 ## when installing ruby select all checkboxes(very important is PATH one)
 #
-## After installation add required gem 'selenium-webdriver' => to install type using command line with ruby: gem install 'selenium-webdriver' << for windows
+## After installation add required gem 'selenium-webdriver' => to install type using command line with ruby: gem install 'selenium-webdriver'
 
 ### MAC OSX ###
 ## If you want to install ruby on MAC OSX then i suggest to follow instructions here (but use ruby in version 2.3.1 or higher):
