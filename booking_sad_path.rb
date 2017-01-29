@@ -1,6 +1,10 @@
 require Dir.pwd + '/test_helper.rb'
 
 start_time = Time.now
+# Desc: This test case is designet to automate booking payment
+# =>    on: https://www.ryanair.com/ie/en/
+# =>    User inputs all needed data but uses invalid card number
+# =>    Booking should be rejected with error
 begin
   # ACTION
   # Desc: Creating user with his card
