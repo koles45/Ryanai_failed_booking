@@ -24,6 +24,7 @@ EXP_ERROR_TITLE = 'Oh. There was a problem'.freeze
 EXP_ERROR_MSG = 'As your payment was not authorised we could not'\
   ' complete your reservation. Please ensure that the information'\
   ' was correct or use a new payment to try again'.freeze
+PAGE_BOTTOM = '/html/body/div[2]/footer/global-footer/div/div[2]/div/div'
 # adds colorization to String class, used in assertion method
 class String
   # colorization
@@ -249,7 +250,7 @@ class SeleniumBrowser
     try ||= 0
     # scrolling to bottom of page before clicking
     # it's a backup if something is covering button
-    scroll_to_elem(:xpath, "//core-icon[@icon-id='ryanair-logomark']")
+    scroll_to_elem(:xpath, PAGE_BOTTOM)
     get_elem_and_click(:id, 'continue')
   rescue Selenium::WebDriver::Error::UnknownError => e
     puts "Error: '#{e.class}' occured, tries again #{try}".yellow
