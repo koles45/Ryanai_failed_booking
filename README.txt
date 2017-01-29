@@ -1,6 +1,14 @@
-# To run this test you need to have Ruby 2.3.1 (or latest) installed => https://rubyinstaller.org/
+# To run this test you need to have Ruby 2.3.1 (or latest) installed => https://rubyinstaller.org/ << for windows
+
+# If you want to install ruby on MAC OSX then i suggest to follow instructions here (but use ruby in version 2.3.1 or higher): 
+https://code.tutsplus.com/tutorials/how-to-install-ruby-on-a-mac--net-21664
+
 # when installing ruby select all checkboxes(very important is PATH one)
-# After installation add required gem 'selenium-webdriver' => to install type using command line with ruby: gem install 'selenium-webdriver'
+
+# After installation add required gem 'selenium-webdriver' => to install type using command line with ruby: gem install 'selenium-webdriver' << for windows
+
+# If you want to install ruby gems on MAC OSX then i suggest to follow instructions here: https://code.tutsplus.com/tutorials/how-to-install-ruby-on-a-mac--net-21664
+
 # To run test:
 # - internet connection
 # - Ryanair booking page should be in EN language
