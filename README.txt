@@ -1,5 +1,5 @@
 # To run this test you need to have Ruby 2.3.1 (or latest) installed => https://rubyinstaller.org/
-# required gem 'selenium-webdriver' => to install type using command line with ruby: gem install 'selenium-webdriver'
+# After installation add required gem 'selenium-webdriver' => to install type using command line with ruby: gem install 'selenium-webdriver'
 # To run test:
 # - internet connection
 # - Ryanair booking page should be in EN language
