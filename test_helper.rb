@@ -5,7 +5,7 @@ COUNTRIES = "//div[@ng-repeat='option in "\
   "$ctrl.firstOptions track by option.id']".freeze
 ONE_WAY = 'lbl-flight-search-type-one-way'.freeze
 MONTHS = %w(
-  January February March April May June July
+  February March April May June July
   August Spetember October November December
 ).freeze
 CALENDAR_BASE = '#row-dates-pax > div:nth-child(1) > div > div.container-from'\
@@ -152,6 +152,7 @@ module UserFormData
   # [user]  -> User object, user from which email and password are gathered
   #            to perform login
   def login(user)
+    sleep 0.3
     get_elem_and_click(:xpath, LOGIN_BUTTON)
     get_elem_and_fill(:xpath, "//input[@type='email']", user.email)
     get_elem_and_fill(:xpath, "//input[@name='password']", user.password)
@@ -170,7 +171,7 @@ module BookingDate
   #       flight from specific Airport. It reads all days from a month
   #       then removes all unavaiable days, if no days in month are found it
   #       uses method next month to check days in next month. Works untill some
-  #       days are found. 
+  #       days are found. Starts from February
   #       IMPORTANT: this method will work only in 2017, may brake if 
   #                  no flights avaiable found
   # Parameters:
