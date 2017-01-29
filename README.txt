@@ -1,4 +1,5 @@
 # To run this test you need to have Ruby 2.3.1 (or latest) installed => https://rubyinstaller.org/
+# when installing ruby select all checkboxes(very important is PATH one)
 # After installation add required gem 'selenium-webdriver' => to install type using command line with ruby: gem install 'selenium-webdriver'
 # To run test:
 # - internet connection
