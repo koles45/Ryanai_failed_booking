@@ -55,6 +55,14 @@ end
 # Raises: This module can raise method specific exceptions.
 # TO DO: -
 module UserFormData
+  # Desc: This method is used to fill users name, surname and title on
+  #       last page before paying for the tickets
+  # Parameters:
+  # [user]  -> User object, user used in test from which first_name,
+  #            surname, title are taken
+  # Raises: 
+  # This method can raise: Selenium::WebDriver::Error::InvalidElementStateError
+  #                        If it does it will re-try to execute up to 3 times
   def fill_name_surname_and_title(user)
     tries ||= 0
     puts "Inputing first name field: '#{name = user.first_name}'"
@@ -69,16 +77,25 @@ module UserFormData
     sleep 1
     retry unless tries > 3
   end
-
+  # Desc: This method is used to fill mobile related data
+  #       (country of mobile, phone nr) on last page before
+  #        paying for the tickets
+  # Parameters:
+  # [user]  -> User object, user used in test
+  #            which has mobile_country and mobile_phone
   def fill_mobile_data(user)
-    mobile_country = user.mobile_country
-    puts "Selecting moble nr country: #{mobile_country}"
+    puts "Selecting moble nr country: #{mobile_country = user.mobile_country}"
     select_item_from_list(:xpath, MOBILE_COUNTRY_SELECT, mobile_country)
     mobile_phone = user.mobile_phone
     puts "Inputing mobile nr: '#{mobile_phone}'"
     get_elem_and_fill(:xpath, MOBILE_NR_FILL, mobile_phone)
   end
-
+  # Desc: This method is used to fill user card related data on
+  #       last page before paying for the tickets
+  # Parameters:
+  # [user]  -> User object, user has card object from  which card number,
+  #            card type, card expiry month and year, card security code
+  #            and card owner(stakeholder)
   def fill_card_data(user)
     puts "Inputing card number: '#{number = user.pay_card.number}'"
     get_elem_and_fill(:xpath, CARD_NR_FILL, number)
@@ -93,7 +110,11 @@ module UserFormData
     puts "Inputing cardholders name: '#{name = user.pay_card.cardholder_name}'"
     get_elem_and_fill(:xpath, "//input[@placeholder='e.g. John Smith']", name)
   end
-
+  # Desc: This method is used to fill users card location data on
+  #       last page before paying for the tickets
+  # Parameters:
+  # [user]  -> User object, user used for retrieving his card data in test
+  #            from which adress lines, city and country are taken
   def fill_location_data(user)
     puts "Inputing address 1: '#{adr1 = user.pay_card.adress_1}'"
     get_elem_and_fill(:id, 'sa.nameAddressLine1', adr1)
@@ -106,22 +127,30 @@ module UserFormData
     puts "Selecting country: '#{country = user.pay_card.country}'"
     select_item_from_list(:xpath, "//select[@id='sa.nameCountry']", country)
   end
-
+  # Desc: This method is a wrapper which executes all data inputs at
+  #       last page before paying for the tickets
+  # Parameters:
+  # [user]  -> User object, user used for retrieving form data used last page
   def fill_user_form(user)
     fill_name_surname_and_title(user)
     fill_mobile_data(user)
     fill_card_data(user)
     fill_location_data(user)
   end
-
+  # Desc: This method is used to check the policy check-box
   def accept_policy
     @browser.find_elements(:xpath, "//div[@class='terms']").first.click
   end
-
+  # Desc: This method is used to click PayNow button on last page
+  #       of booking process
   def pay_now
     get_elem_and_click(:xpath, "//button[@ng-if='!pm.isMobile']")
   end
-
+  # Desc: This method is used to log in before inputing any payment details
+  #       on last page before paying for booking
+  # Parameters:
+  # [user]  -> User object, user from which email and password are gathered
+  #            to perform login
   def login(user)
     get_elem_and_click(:xpath, LOGIN_BUTTON)
     get_elem_and_fill(:xpath, "//input[@type='email']", user.email)
@@ -137,6 +166,23 @@ end
 # Raises: This method should not raise any exception.
 # TO DO: -
 module BookingDate
+  # Desc: This method is used to find first month with avaiable days to book
+  #       flight from specific Airport. It reads all days from a month
+  #       then removes all unavaiable days, if no days in month are found it
+  #       uses method next month to check days in next month. Works untill some
+  #       days are found. 
+  #       IMPORTANT: this method will work only in 2017, may brake if 
+  #                  no flights avaiable found
+  # Parameters:
+  # [month]  -> string, name of month to start searching from
+  # Raises: 
+  # This method can raise: Selenium::WebDriver::Error::NoSuchElementError
+  #                        when month is not avaiable for booking
+  #                        ArgumentError when invalid month is passed
+  # Returns:
+  #         [avaiable_days] => array, array of all found avaiable days
+  #                            or nil when no days are found
+  # ToDo: extend method so it can be used in more than 2017 year
   def find_avaiable_flights_in_month(month)
     unless MONTHS.include?(month)
       raise ArgumentError "Month you passed is: #{month} and should be"\
@@ -165,33 +211,46 @@ module BookingDate
   rescue Selenium::WebDriver::Error::NoSuchElementError
     puts "Month selected: #{month} not avaiable for booking.".yellow
   end
-
+  # Desc: This method is used to go to next month in calendar
+  #       when selecting fligh dates
   def next_month
     get_elem_and_click(:xpath, NEXT_MONTH_BUTTON)
   end
-
+  # Desc: This method is used to select user choosen country
+  #       when selecting airport
+  # Parameters:
+  # [user_country]  -> string, country which user wants to select
   def select_country(user_country)
     countires = @browser.find_elements(:xpath, COUNTRIES)
     countires.each.find do |country|
       country.text == user_country
     end.click
   end
-
+  # Desc: This method wraps select_country method and additionally selects city
+  #       It is used to select origin place of flight
+  # Parameters:
+  # [country]  -> string, country which user wants to select
+  # [city]     -> string, city which user wants to select
   def select_origin(country, city)
     get_elem_and_click(:xpath, "//input[@placeholder='Departure airport']")
     select_country(country)
     get_elem_and_click(:xpath, "//*[contains(text(), '#{city}')]")
   end
-
+  # Desc: This method wraps select_country method and additionally selects city
+  #       It is used to select destination place of flight
+  # Parameters:
+  # [country]  -> string, country which user wants to select
+  # [city]     -> string, city which user wants to select
   def select_destination(country, city)
     select_country(country)
     get_elem_and_click(:xpath, "//*[contains(text(), '#{city}')]")
   end
-
+  # Desc: This method is used to select one way flight direction options
   def choose_one_way
     get_elem_and_click(:id, ONE_WAY)
   end
-
+  # Desc: This method is used to click lets go button when destination and
+  # =>    orign airports have beed selected
   def lets_go
     get_elem_and_click(:xpath, LETS_GO_BUTTON)
   end
@@ -212,24 +271,31 @@ class SeleniumBrowser
     @wait = Selenium::WebDriver::Wait.new(timeout: 25)
     @browser.manage.window.maximize
   end
-
+  # Desc: This method is used to navigate in browser to specific page
+  # Parameters:
+  # [url]  -> string, url to page which browser will go to
   def go_to(url)
     @browser.navigate.to url
   end
-
+  # Desc: This method is used to close browser
   def quit
     @browser.close
   end
-
+  # Desc: This method is used to wait for booking page to load
+  # =>    it is done by checking if specific element is present on page
   def wait_for_booking_page_load
     get_element(:xpath, "//*[contains(text(), 'from')]")
   end
-
+  # Desc: This method is used to wait for Recommended page to load
+  # =>    it is done by checking if specific element is present on page
   def wait_for_recommended_page_load
     exp_text = 'Recommended for you'
     get_element(:xpath, "//*[contains(text(), '#{exp_text}')]")
   end
-
+  # Desc: This method is used to click price on price selecting page
+  # Raises: 
+  # This method can raise: Selenium::WebDriver::Error::UnknownError
+  #                        If it does it will re-try to execute up to 3 times
   def click_price
     try ||= 0
     get_elem_and_click(:xpath, "//*[contains(text(), 'from')]")
@@ -240,12 +306,19 @@ class SeleniumBrowser
     sleep 1
     retry unless try > 3
   end
-
+  # Desc: This method is used to scroll to specified element on page
+  # Parameters:
+  # [by]    -> symbol, argument used to identify how to find element
+  # [value] -> string, argument used to identify what is the elem to find
   def scroll_to_elem(by, value)
     elem = get_element(by, value)
     elem.location_once_scrolled_into_view
     sleep 0.3
   end
+  # Desc: This method is used to click contine button
+  # Raises: 
+  # This method can raise: Selenium::WebDriver::Error::UnknownError
+  #                        If it does it will re-try to execute up to 5 times
   def countinue
     try ||= 0
     # scrolling to bottom of page before clicking
@@ -258,7 +331,13 @@ class SeleniumBrowser
     sleep 1
     retry unless try > 5
   end
-
+  # Desc: This method is used to check out the flight by clicking
+  #       check out button and close seat selection pop up
+  # Raises: 
+  # This method can raise: Selenium::WebDriver::Error::NoSuchElementError
+  #                        If it does it will re-try to execute up to 5 times
+  #                        Selenium::WebDriver::Error::TimeOutError
+  #                        If it does it will re-try to execute up to 7 times
   def check_out
     get_elem_and_click(:xpath, "//*[contains(text(), 'Check out')]")
     begin
@@ -276,22 +355,32 @@ class SeleniumBrowser
       retry unless try > 7
     end
   end
-
+  # Desc: This method is used to close seat selection pop up
   def seat_popup_ok
     get_elem_and_click(:xpath, "//*[contains(text(), 'Ok, thanks')]")
   end
-
+  # Desc: This method is used to select item from given list
+  # Parameters:
+  # [by]         -> symbol, argument used to identify how to find element
+  # [value]      -> string, argument used to identify what is the elem to find
+  # [option_text]-> string, identify option which should be selected
   def select_item_from_list(by, value, option_text)
     items = @browser.find_elements(by, value).first
     items.find_elements(tag_name: 'option').find do |option|
       option.text == option_text
     end.click
   end
-
+  # Desc: This method is used to close cookie pop up
   def cookie_popup_close
     get_elem_and_click(:xpath, "//core-icon[@icon-id='glyphs.close']")
   end
-
+  # Desc: This method is used to check payment error
+  # Raises: 
+  # This method can raise: Selenium::WebDriver::Error::TimeOutError
+  #                        If it does it indicates that expected error
+  #                        was not received
+  # Returns:
+  # title_text, error_text
   def check_payment_error
     title_text = get_element(:xpath, "//div[@ng-if='$ctrl.textTitle']").text
     begin
@@ -306,24 +395,36 @@ class SeleniumBrowser
     end
     return title_text, error_text
   end
-
+  # Desc: This method is used to get actual url of browser active page
   def actual_url
     @browser.current_url
   end
 
   private
-
+  # Desc: This method is used to input data to specific field
+  # Parameters:
+  # [by]     -> symbol, argument used to identify how to find element
+  # [value]  -> string, argument used to identify what is the elem to find
+  # [data]   -> string, data which should be inputed into selected field
   def get_elem_and_fill(by, value, data)
     field = get_element(by, value)
     field.clear
     field.send_keys data
   end
-
+  # Desc: This method is used to get and click specific element
+  # Parameters:
+  # [by]     -> symbol, argument used to identify how to find element
+  # [value]  -> string, argument used to identify what is the elem to find
   def get_elem_and_click(by, value)
     elem = get_element(by, value)
     elem.click
   end
-
+  # Desc: This method is used to get specific element
+  # Parameters:
+  # [by]     -> symbol, argument used to identify how to find element
+  # [value]  -> string, argument used to identify what is the elem to find
+  # Raises: 
+  # This method can raise error when it times out
   def get_element(by, value)
     @wait.until { @browser.find_element(by, value).displayed? }
     element = @browser.find_element(by, value) # ; @wait.until { element.displayed?}
