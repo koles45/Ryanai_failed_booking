@@ -208,7 +208,7 @@ class SeleniumBrowser
   def initialize
     Selenium::WebDriver::Chrome.driver_path = CHROME_DRIVER_PATH
     @browser = Selenium::WebDriver.for :chrome
-    @wait = Selenium::WebDriver::Wait.new(timeout: 15)
+    @wait = Selenium::WebDriver::Wait.new(timeout: 25)
     @browser.manage.window.maximize
   end
 
@@ -240,8 +240,16 @@ class SeleniumBrowser
     retry unless try > 3
   end
 
+  def scroll_to_elem(by, value)
+    elem = get_element(by, value)
+    elem.location_once_scrolled_into_view
+    sleep 0.3
+  end
   def countinue
     try ||= 0
+    # scrolling to bottom of page before clicking
+    # it's a backup if something is covering button
+    scroll_to_elem(:xpath, "//core-icon[@icon-id='ryanair-logomark']")
     get_elem_and_click(:id, 'continue')
   rescue Selenium::WebDriver::Error::UnknownError => e
     puts "Error: '#{e.class}' occured, tries again #{try}".yellow
